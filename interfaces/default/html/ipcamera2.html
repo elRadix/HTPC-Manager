@@ -1,0 +1,44 @@
+<%inherit file="base.html"/>
+<% settings = self.attr.settings %>
+<div class="container">
+    <div class="content">
+        <h1 class="page-header page-title">
+            <a href="webinterface" target="_blank">${settings.get('ipcamera_name', 'ipcamera')}</a>
+            <div class="btn-toolbar pull-right">
+                <div class="btn-group">
+                    <select id="servers"></select>
+                </div>
+            </div>
+            </h1>
+            
+            <!--<div class="row-fluid">-->
+                <div class"span12">
+                    <div class="text-center"><img src="http://192.168.1.206:8986/videostream.cgi?user=admin2&pass=folstad86"></div>
+                
+                </div>
+                <div class="span4"></div>
+                <div class="span4">
+                    <!--<div class="btn-group">-->
+                        <button class="btn"><i class="icon-arrow-up"></i></button>
+                        <button class="btn"><i class="icon-arrow-down"></i></button>
+                        <button class="btn"><i class="icon-arrow-left"></i></button>
+                        <button class="btn"><i class="icon-arrow-right"></i></button>
+                        <button class="btn"><i class="icon-camera"></i></button>
+                        <button class="btn"><i class=""></i>VP</button>
+                        <button class="btn"><i class=""></i>VP</button>
+                        <button class="btn"><i class=""></i>Set 1</button>
+                        <button class="btn"><i class=""></i>Set 2</button>
+                        <button class="btn"><i class=""></i>Set 3</button>
+                        <button class="btn"><i class=""></i>Set 4</button>
+                        <button class="btn"><i class=""></i>1</button>
+                        <button class="btn"><i class=""></i>2</button>
+                        <button class="btn"><i class=""></i>3</button>
+                        <button class="btn"><i class=""></i>4</button>
+                    <!--</div>-->
+                </div>
+                <div class="span4"></div>
+            
+            </div>
+    </div>
+      
+</div>
