@@ -29,7 +29,7 @@ import shutil
 from htpc.root import do_restart
 
 # configure git repo
-gitUser = 'styxit'
+gitUser = 'hellowlol'
 gitRepo = 'HTPC-Manager'
 
 
@@ -61,10 +61,13 @@ class Updater:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def index(self):
+    def index(self, force=False):
         """ Update on POST. Check for new updates on GET. """
         if cherrypy.request.method.upper() == 'POST':
             Thread(target=self.updateEngine.update).start()
+            return 1
+        elif cherrypy.request.method.upper() == 'POST' and force:
+            Thread(target=self.updateEngine.update(force=True)).start()
             return 1
         else:
             return self.check_update()
@@ -194,12 +197,12 @@ class GitUpdater():
         if re.match('^[a-z0-9]+$', output):
             return output
 
-    def update(self):
+    def update(self, force=False):
         """ Do update through git """
         self.logger.info("Attempting update through Git.")
         self.UPDATING = 1
 
-        output = self.git_exec('pull origin %s' % htpc.settings.get('branch'))
+        output = self.git_exec('pull origin %s' % htpc.settings.get('branch', 'master'))
         if not output:
             self.logger.error("Unable to update through git. Make sure that Git is located in your path and can be accessed by this application.")
         elif 'Aborting.' in output:
@@ -278,13 +281,13 @@ class SourceUpdater():
             return currentVersion
 
     """ Do update from source """
-    def update(self):
+    def update(self, force=False):
         self.logger.info("Attempting update from source.")
 
         self.UPDATING = 1
         cherrypy.engine.exit()
 
-        tarUrl = 'https://github.com/%s/%s/tarball/%s' % (gitUser, gitRepo, htpc.settings.get('branch'))
+        tarUrl = 'https://github.com/%s/%s/tarball/%s' % (gitUser, gitRepo, htpc.settings.get('branch', 'master'))
 
         # Download tar
         downloaded = self.__downloadTar(tarUrl, self.updateFile)

@@ -226,3 +226,25 @@ function get_branches() {
 
     }, 'json');
 }
+
+
+$(document).on('click', '.force_update', function(e){
+    c_branch = $('#branch').text();
+    console.log(c_branch);
+    //if confirm('Are you want to update to '+ c_branch+'?') {};
+    $.ajax({
+        'url': WEBDIR + 'update/?force=True',
+        'dataType': 'json',
+        'type': 'post',
+        'success': function(response) {
+            if (response.success) {
+                $('.delete_cache').addClass('btn-success').removeClass('btn-danger');
+                notify('Info', 'Cache folder was deleted', 'success', 5);
+
+            } else {
+                $('.delete_cache').addClass('btn-danger').removeClass('btn-success');
+                notify('Error', 'Failed to delete cache folder', 'error', 5);
+            }
+        }
+    });
+});
