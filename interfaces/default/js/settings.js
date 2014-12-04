@@ -72,6 +72,32 @@ $(document).ready(function () {
         });
     });
     xbmc_update_servers(0);
+    $('input.enable-module').trigger('change');
+        $('#tvs').change(function () {
+        var item = $(this);
+        var id = item.val();
+        $.get(WEBDIR + 'samsungtv/findtv?id=' + id, function (data) {
+            console.log(data)
+            if (data === null) return;
+            //console.log(data.servers.serverName);
+            alert(data.host);
+            $('#samsungtv_host').val(data.host);
+            $('#samsungtv_model').val(data.tv_model);
+            $('#samsung_htpcmac').val(data.mac);
+            $('#samsung_htpchost').val(data.local_ip);
+            //$('#samsung_htpcmac').val(data.servers.port);
+        });
+    });
+    samsung_tvs(0);
+    /*
+    host: "192.168.1.151"
+    id: 6
+    local_ip: "192.168.1.112"
+    mac: "E8:E0:B7:D3:A4:62"
+    name: "[TV]UE55D6300"
+    tv_model: "UE55D6300
+
+    */
 });
 
 function xbmc_update_servers(id) {
@@ -82,6 +108,71 @@ function xbmc_update_servers(id) {
             var option = $('<option>').text(item.name).val(item.id);
             if (id == item.id) option.attr('selected', 'selected');
             servers.append(option);
+        });
+    }, 'json');
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+    $('#tvs').change(function () {
+        var item = $(this);
+        var id = item.val();
+        $.get(WEBDIR + 'samsungtv/findtv?id=' + id, function (data) {
+            if (data === null) return;
+            //console.log(data.servers.serverName);
+            $('#samsungtv_name').val(data.name);
+            $('#samsungtv_model').val(data.tv_model);
+            $('#samsung_htpcmac').val(data.mac);
+            $('#samsung_htpchost').val(data.local_ip);
+            //$('#samsung_htpcmac').val(data.servers.port);
+        });
+    });
+    samsung_tvs(0);
+});
+*/
+
+function samsung_tvs(id) {
+    $.get(WEBDIR + 'samsungtv/findtv', function (data) {
+        if (data === null) return;
+        var tv = $('#tvs').empty().append($('<option>').text('Select').val(0));
+        $.each(data, function (i, item) {
+            var option = $('<option>').text(item.name).val(item.id);
+            if (id == item.id) option.attr('selected', 'selected');
+            tv.append(option);
         });
     }, 'json');
 }
