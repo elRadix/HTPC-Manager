@@ -10,7 +10,10 @@ import ssdp
 import xmltodict
 import urllib2
 import re
-from uuid import getnode as get_mac
+import itertools
+import operator
+from operator import itemgetter
+#from uuid import getnode as get_mac
 
 
 class Samsungtv:
@@ -21,15 +24,16 @@ class Samsungtv:
             'id': 'samsungtv',
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'samsungtv_enable'},
+                {'type': 'text', 'label': 'Name', 'name': 'samsungtv_name'},
                 {'type': 'select',
-                 'label': 'Name',
+                 'label': 'TVs',
                  'name': 'tvs',
                  'options': [
                     {'name': 'Select', 'value': 0}
                 ]},
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'samsungtv_host'},
-                {'type': 'text', 'label': 'Tv model', 'name': 'samsungtv_model'},
-                {'type': 'text', 'label': 'Htpc-Manager MAC', 'name': 'samsung_htpcmac'},
+                {'type': 'text', 'label': 'Tv Model', 'name': 'samsungtv_model'},
+                {'type': 'text', 'label': 'HTPC-Manager MAC', 'name': 'samsung_htpcmac'},
                 {'type': 'text', 'label': 'HTPC-Manager IP', 'name': 'samsung_htpchost'}
 
         ]})
@@ -86,27 +90,29 @@ class Samsungtv:
         r = []
         sr = 0
 
-        # Find local ip
-        ip = socket.socket(socket.AF_INET, socket.SOCK_DGRAM);
+        # Find htpc.managers ip
+        ip = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         ip.connect(('8.8.8.8', 80))
-        local_ip =(ip.getsockname()[0])
+        local_ip = ip.getsockname()[0]
 
         iid = 0
 
         # Tries to find the mac, this is likly to be the wrong one.. my tv accepts anything
-        mac = ':'.join(("%012X" % get_mac())[i:i+2] for i in range(0, 12, 2))
+        #mac = ':'.join(("%012X" % get_mac())[i:i+2] for i in range(0, 12, 2))
+        # Fake the mac since my tv accepts anything
+        mac = 'E8:E0:B7:D3:A4:62'
 
-        # Since udp sucks
+        # Since udp sucks balls
         while True:
             sr += 1
             search = ssdp.discover('ssdp:all')
+            #search = ssdp.discover('urn:samsung.com:device:RemoteControlReceiver:1')
             r.append(search)
             if len(r) >= 2:
                 break
 
         for i in r:
             for item in i:
-
                 host = self.getIPfromString(item.location)
                 if host:
                     try:
@@ -126,12 +132,19 @@ class Samsungtv:
                     except Exception as e:
                         print e
         if id:
-            id = int(id)
             for tt in result_list:
-                print tt
-                if tt["id"] == id:
-                    print "its a unique id"
+                if tt["id"] == int(id):
                     return tt
-        # fix this one, need to check against the id
-        # Since same dict can be in the list multiple time, clean it.
-        return [dict(t) for t in set([tuple(z.items()) for z in result_list])]
+
+        if len(result_list) == 1:
+            return result_list
+
+        # Make remove dupe dicts from list
+        getvals = operator.itemgetter('host')
+        result_list.sort(key=getvals)
+        result = []
+        for k, g in itertools.groupby(result_list, getvals):
+            result.append(g.next())
+        result_list[:] = result
+
+        return result_list
